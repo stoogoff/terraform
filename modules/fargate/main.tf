@@ -53,7 +53,8 @@ resource "aws_ecs_task_definition" "td" {
 				awslogs-stream-prefix = "ecs"
 			}
 		}
-	}])
+    mountPoints = var.task_mount_points
+  }])
 
 	tags = local.tags
 }
