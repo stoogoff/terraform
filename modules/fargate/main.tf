@@ -55,15 +55,6 @@ resource "aws_ecs_task_definition" "td" {
 		}
   }])
 
-  volume {
-		name = "efs-mount"
-
-		efs_volume_configuration {
-			file_system_id = var.task_mount_points.sourceVolume
-			root_directory = var.task_mount_points.containerPath
-		}
-  }
-
 	tags = local.tags
 }
 

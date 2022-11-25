@@ -53,15 +53,6 @@ variable "container_count" {
 	default     = 2
 }
 
-variable "task_mount_points" {
-	description = "EFS volume for the task."
-	type        = object({
-		sourceVolume = string,
-		containerPath = string,
-	})
-	default     = null
-}
-
 # Health check
 variable "health_check_path" {
 	type        = string
