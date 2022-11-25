@@ -9,11 +9,6 @@ variable "website_repository" {
 	description = "The container repository to load the website image from."
 }
 
-variable "couch_repository" {
-	type        = string
-	description = "The container repository to load the couchdb image from."
-}
-
 variable "zone_id" {
 	type        = string
 	description = "DNS Zone ID to attach subdomains to."

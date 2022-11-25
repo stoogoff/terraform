@@ -55,11 +55,10 @@ variable "container_count" {
 
 variable "task_mount_points" {
 	description = "EFS volume for the task."
-	type        = list(object({
+	type        = object({
 		sourceVolume = string,
 		containerPath = string,
-		readOnly = bool
-	}))
+	})
 	default     = null
 }
 

@@ -53,8 +53,16 @@ resource "aws_ecs_task_definition" "td" {
 				awslogs-stream-prefix = "ecs"
 			}
 		}
-    mountPoints = var.task_mount_points
   }])
+
+  volume {
+		name = "efs-mount"
+
+		efs_volume_configuration {
+			file_system_id = var.task_mount_points.sourceVolume
+			root_directory = var.task_mount_points.containerPath
+		}
+  }
 
 	tags = local.tags
 }
@@ -64,7 +72,7 @@ resource "aws_ecs_service" "service" {
 	cluster                            = aws_ecs_cluster.cluster.id
 	task_definition                    = aws_ecs_task_definition.td.arn
 	desired_count                      = var.container_count
-	deployment_minimum_healthy_percent = (100 / var.container_count)
+	deployment_minimum_healthy_percent = 50
 	deployment_maximum_percent         = 200
 	health_check_grace_period_seconds  = 30
 	launch_type                        = "FARGATE"
@@ -115,7 +123,7 @@ resource "aws_alb_target_group" "tg" {
 	}
 
 	stickiness {
-		enabled = true
+		enabled = false
 		type    = "lb_cookie"
 	}
 

@@ -32,6 +32,22 @@ resource "aws_security_group" "web_access" {
 		cidr_blocks      = ["0.0.0.0/0"]
 	}
 
+	ingress {
+		description      = "SSH"
+		from_port        = 22
+		to_port          = 22
+		protocol         = "tcp"
+		cidr_blocks      = ["0.0.0.0/0"]
+	}
+
+	ingress {
+		description     = local.couchdb.name
+		from_port       = local.couchdb.port
+		to_port         = local.couchdb.port
+		protocol        = "tcp"
+		cidr_blocks      = ["0.0.0.0/0"]
+	}
+
 	egress {
 		from_port        = 0
 		to_port          = 0
@@ -65,7 +81,7 @@ resource "aws_security_group" "container_access" {
 		from_port       = local.couchdb.port
 		to_port         = local.couchdb.port
 		protocol        = "tcp"
-		security_groups = [aws_security_group.web_access.id]
+		self            = true
 	}
 
 	egress {
