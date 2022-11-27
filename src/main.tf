@@ -42,9 +42,9 @@ module "website" {
 	health_check_path   = "/api/hello"
 }
 
-resource "aws_route53_record" "staging" {
+resource "aws_route53_record" "www" {
 	zone_id = var.zone_id
-	name    = "staging.stoogoff.com"
+	name    = "www.stoogoff.com"
 	type    = "CNAME"
 	ttl     = 300
 	records = [module.website.loadbalancer.dns]
