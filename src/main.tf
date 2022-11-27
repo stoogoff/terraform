@@ -21,23 +21,6 @@ provider "aws" {
 	region = local.aws_region
 }
 
-resource "aws_instance" "couchdb" {
-  ami                    = local.couch_ami
-  instance_type          = local.couch_instance
-  vpc_security_group_ids = [aws_security_group.container_access.id]
-	subnet_id              = module.network.private_subnets[0]
-	key_name               = "stoo@lamorak"
-
-	root_block_device {
-		volume_size = 30
-	}
-
-  tags = {
-    Name = local.couchdb.name
-    env = local.environment
-  }
-}
-
 # Website Fargate cluster
 module "website" {
   source = "../modules/fargate"
@@ -65,4 +48,12 @@ resource "aws_route53_record" "staging" {
 	type    = "CNAME"
 	ttl     = 300
 	records = [module.website.loadbalancer.dns]
+}
+
+resource "aws_route53_record" "db" {
+	zone_id = var.zone_id
+	name    = "db.stoogoff.com"
+	type    = "CNAME"
+	ttl     = 300
+	records = [aws_alb.couchdb.dns_name]
 }

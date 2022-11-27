@@ -13,3 +13,8 @@ variable "zone_id" {
 	type        = string
 	description = "DNS Zone ID to attach subdomains to."
 }
+
+variable "db_password" {
+	type        = string
+	description = "Database password for the docker script."
+}
