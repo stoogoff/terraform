@@ -23,12 +23,12 @@ provider "aws" {
 
 # Website Fargate cluster
 module "website" {
-  source = "../modules/fargate"
+	source = "../modules/fargate"
 
 	name                = "stoogoff"
 	aws_region          = local.aws_region
 	environment         = local.environment
-	certificate         = var.certificate
+	certificate         = var.certificate_euwest1
 	task_execution_role = aws_iam_role.ecs_task_execution_role.arn
 	repository          = var.website_repository
 	env_file_bucket     = local.env_file_bucket

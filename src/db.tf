@@ -85,7 +85,7 @@ resource "aws_alb_listener" "couchdb_https" {
 	protocol          = "HTTPS"
 
 	ssl_policy        = "ELBSecurityPolicy-2016-08"
-	certificate_arn   = var.certificate
+	certificate_arn   = var.certificate_euwest1
 
 	default_action {
 		target_group_arn = aws_alb_target_group.couchdb.id
