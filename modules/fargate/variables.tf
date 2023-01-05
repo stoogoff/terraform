@@ -53,6 +53,18 @@ variable "container_count" {
 	default     = 2
 }
 
+variable "cpu" {
+	type        = number
+	description = "The number of containers to run simultaneously."
+	default     = 512
+}
+
+variable "ram" {
+	type        = number
+	description = "The number of containers to run simultaneously."
+	default     = 1024	
+}
+
 # Health check
 variable "health_check_path" {
 	type        = string

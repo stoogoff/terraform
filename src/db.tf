@@ -3,15 +3,15 @@ resource "aws_instance" "couchdb" {
 	ami                    = local.couch_ami
 	instance_type          = local.couch_instance
 	vpc_security_group_ids = [aws_security_group.container_access.id]
-	subnet_id              = module.network.private_subnets[0]
+	subnet_id              = module.network.public_subnets[0]
 	key_name               = "stoo@lamorak"
 
 	root_block_device {
-		volume_size = 8
+		volume_size = 20
 	}
 
 	tags = {
-		Name = local.couchdb.name
+		Name = "Web and DB Server"
 		env = local.environment
 	}
 
@@ -56,8 +56,33 @@ resource "aws_alb_target_group" "couchdb" {
 	depends_on = [aws_alb.couchdb]
 }
 
+resource "aws_alb_target_group" "website" {
+	name        = "website-${local.environment}-tg"
+	port        = local.website.port
+	protocol    = "HTTP"
+	vpc_id      = module.network.vpc_id
+	target_type = "instance"
+
+	health_check {
+		healthy_threshold   = 3
+		interval            = 30
+		protocol            = "HTTP"
+		matcher             = "200"
+		timeout             = 3
+		path                = "/api/hello"
+		unhealthy_threshold = 2
+	}
+
+	depends_on = [aws_alb.couchdb]
+}
+
 resource "aws_alb_target_group_attachment" "couchdb" {
 	target_group_arn = aws_alb_target_group.couchdb.arn
+	target_id        = aws_instance.couchdb.id
+}
+
+resource "aws_alb_target_group_attachment" "website" {
+	target_group_arn = aws_alb_target_group.website.arn
 	target_id        = aws_instance.couchdb.id
 }
 
@@ -93,4 +118,36 @@ resource "aws_alb_listener" "couchdb_https" {
 	}
 
 	depends_on = [aws_alb.couchdb, aws_alb_target_group.couchdb]
+}
+
+resource "aws_lb_listener_rule" "db" {
+	listener_arn = aws_alb_listener.couchdb_https.arn
+	priority     = 100
+
+	action {
+		type             = "forward"
+		target_group_arn = aws_alb_target_group.couchdb.id
+	}
+
+	condition {
+		host_header {
+			values = ["db.stoogoff.com"]
+		}
+	}
+}
+
+resource "aws_lb_listener_rule" "website" {
+	listener_arn = aws_alb_listener.couchdb_https.arn
+	priority     = 99
+
+	action {
+		type             = "forward"
+		target_group_arn = aws_alb_target_group.website.id
+	}
+
+	condition {
+		host_header {
+			values = ["www.stoogoff.com"]
+		}
+	}
 }

@@ -19,5 +19,5 @@ variable "public_cidr_block" {
 variable "private_cidr_block" {
   type        = list(string)
   description = "A list of IP address ranges to use for private subnets."
-  default     = ["10.0.101.0/24"]
+  default     = []
 }

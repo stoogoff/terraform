@@ -22,23 +22,23 @@ resource "aws_internet_gateway" "gateway" {
 	}
 }
 
-resource "aws_eip" "ip" {
+/*resource "aws_eip" "ip" {
 	vpc        = true
 	depends_on = [aws_internet_gateway.gateway]
 
 	tags = {
 		Name =  "${var.vpc_name}-eip"
 	}
-}
+}*/
 
-resource "aws_nat_gateway" "gateway" {
+/*resource "aws_nat_gateway" "gateway" {
 	allocation_id = aws_eip.ip.id
 	subnet_id     = aws_subnet.public[0].id
 
 	tags = {
 		Name =  "${var.vpc_name}-nat"
 	}
-}
+}*/
 
 resource "aws_subnet" "public" {
 	count                   = length(var.public_cidr_block)
@@ -78,11 +78,11 @@ resource "aws_route" "public" {
 	gateway_id             = aws_internet_gateway.gateway.id
 }
 
-resource "aws_route" "private" {
+/*resource "aws_route" "private" {
 	route_table_id         = aws_vpc.vpc.main_route_table_id
 	destination_cidr_block = "0.0.0.0/0"
 	nat_gateway_id         = aws_nat_gateway.gateway.id
-}
+}*/
 
 resource "aws_route_table_association" "public" {
 	count          = length(aws_subnet.public)

@@ -6,7 +6,6 @@ module "network" {
 	vpc_name           = local.environment
 	cidr_block         = "10.0.0.0/16"
 	public_cidr_block  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-	private_cidr_block = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
 }
 
 # Public web access security group
@@ -65,8 +64,6 @@ resource "aws_security_group" "container_access" {
 		from_port       = local.couchdb.port
 		to_port         = local.couchdb.port
 		protocol        = "tcp"
-		#self            = true
-		cidr_blocks      = ["0.0.0.0/0"]
 		security_groups = [aws_security_group.web_access.id]
 	}
 
