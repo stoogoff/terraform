@@ -36,9 +36,11 @@ resource "aws_alb" "couchdb" {
 	enable_deletion_protection = false
 }
 
-resource "aws_alb_target_group" "couchdb" {
-	name        = "couchdb-${local.environment}-tg"
-	port        = local.couchdb.port
+resource "aws_alb_target_group" "targets" {
+	count = length(local.domains)
+
+	name        = "${local.domains[count.index].name}-${local.environment}-tg"
+	port        = local.domains[count.index].port
 	protocol    = "HTTP"
 	vpc_id      = module.network.vpc_id
 	target_type = "instance"
@@ -49,40 +51,17 @@ resource "aws_alb_target_group" "couchdb" {
 		protocol            = "HTTP"
 		matcher             = "200"
 		timeout             = 3
-		path                = "/"
+		path                = local.domains[count.index].health_check
 		unhealthy_threshold = 2
 	}
 
 	depends_on = [aws_alb.couchdb]
 }
 
-resource "aws_alb_target_group" "website" {
-	name        = "website-${local.environment}-tg"
-	port        = local.website.port
-	protocol    = "HTTP"
-	vpc_id      = module.network.vpc_id
-	target_type = "instance"
+resource "aws_alb_target_group_attachment" "attachments" {
+	count = length(aws_alb_target_group.targets)
 
-	health_check {
-		healthy_threshold   = 3
-		interval            = 30
-		protocol            = "HTTP"
-		matcher             = "200"
-		timeout             = 3
-		path                = "/api/hello"
-		unhealthy_threshold = 2
-	}
-
-	depends_on = [aws_alb.couchdb]
-}
-
-resource "aws_alb_target_group_attachment" "couchdb" {
-	target_group_arn = aws_alb_target_group.couchdb.arn
-	target_id        = aws_instance.couchdb.id
-}
-
-resource "aws_alb_target_group_attachment" "website" {
-	target_group_arn = aws_alb_target_group.website.arn
+	target_group_arn = element(aws_alb_target_group.targets.*.arn, count.index)
 	target_id        = aws_instance.couchdb.id
 }
 
@@ -113,41 +92,27 @@ resource "aws_alb_listener" "couchdb_https" {
 	certificate_arn   = var.certificate_euwest1
 
 	default_action {
-		target_group_arn = aws_alb_target_group.couchdb.id
+		target_group_arn = aws_alb_target_group.targets[0].id
 		type             = "forward"
 	}
 
-	depends_on = [aws_alb.couchdb, aws_alb_target_group.couchdb]
+	depends_on = [aws_alb.couchdb, aws_alb_target_group.targets[0]]
 }
 
-resource "aws_lb_listener_rule" "db" {
+resource "aws_lb_listener_rule" "rules" {
+	count = length(local.domains)
+
 	listener_arn = aws_alb_listener.couchdb_https.arn
-	priority     = 100
+	priority     = 100 - count.index
 
 	action {
 		type             = "forward"
-		target_group_arn = aws_alb_target_group.couchdb.id
+		target_group_arn = element(aws_alb_target_group.targets.*.id, count.index)
 	}
 
 	condition {
 		host_header {
-			values = ["db.stoogoff.com"]
-		}
-	}
-}
-
-resource "aws_lb_listener_rule" "website" {
-	listener_arn = aws_alb_listener.couchdb_https.arn
-	priority     = 99
-
-	action {
-		type             = "forward"
-		target_group_arn = aws_alb_target_group.website.id
-	}
-
-	condition {
-		host_header {
-			values = ["www.stoogoff.com"]
+			values = [local.domains[count.index].domain]
 		}
 	}
 }

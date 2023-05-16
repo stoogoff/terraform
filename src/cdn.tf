@@ -99,7 +99,7 @@ resource "aws_s3_bucket_public_access_block" "cdn_bucket" {
 }
 
 resource "aws_route53_record" "cdn" {
-	zone_id = var.zone_id
+	zone_id = var.zone_id_stoogoff
 	name    = "cdn.stoogoff.com"
 	type    = "CNAME"
 	ttl     = 300

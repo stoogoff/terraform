@@ -52,6 +52,28 @@ resource "aws_security_group" "container_access" {
 	vpc_id      = module.network.vpc_id
 
 	ingress {
+		description     = local.domains[0].name
+		from_port       = local.domains[0].port
+		to_port         = local.domains[0].port
+		protocol        = "tcp"
+		security_groups = [aws_security_group.web_access.id]
+	}
+	ingress {
+		description     = local.domains[1].name
+		from_port       = local.domains[1].port
+		to_port         = local.domains[1].port
+		protocol        = "tcp"
+		security_groups = [aws_security_group.web_access.id]
+	}
+	ingress {
+		description     = local.domains[2].name
+		from_port       = local.domains[2].port
+		to_port         = local.domains[2].port
+		protocol        = "tcp"
+		security_groups = [aws_security_group.web_access.id]
+	}
+
+	/*ingress {
 		description     = local.website.name
 		from_port       = local.website.port
 		to_port         = local.website.port
@@ -65,7 +87,7 @@ resource "aws_security_group" "container_access" {
 		to_port         = local.couchdb.port
 		protocol        = "tcp"
 		security_groups = [aws_security_group.web_access.id]
-	}
+	}*/
 
 	ingress {
 		description      = "SSH"

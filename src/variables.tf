@@ -14,7 +14,12 @@ variable "website_repository" {
 	description = "The container repository to load the website image from."
 }
 
-variable "zone_id" {
+variable "zone_id_stoogoff" {
+	type        = string
+	description = "DNS Zone ID to attach subdomains to."
+}
+
+variable "zone_id_aegean" {
 	type        = string
 	description = "DNS Zone ID to attach subdomains to."
 }
