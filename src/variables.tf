@@ -19,6 +19,11 @@ variable "zone_id_aegean" {
 	description = "DNS Zone ID to attach subdomains to."
 }
 
+variable "zone_id_weevolve" {
+	type        = string
+	description = "DNS Zone ID to attach subdomains to."
+}
+
 variable "db_password" {
 	type        = string
 	description = "Database password for the docker script."

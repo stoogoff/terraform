@@ -14,6 +14,7 @@ locals {
 			domain       = "db.stoogoff.com"
 			zone         = var.zone_id_stoogoff
 			health_check = "/"
+			exclude_dns  = false
 		},
 		{
 			name         = "website"
@@ -21,6 +22,7 @@ locals {
 			domain       = "www.stoogoff.com"
 			zone         = var.zone_id_stoogoff
 			health_check = "/api/hello"
+			exclude_dns  = false
 		},
 		{
 			name         = "aegean"
@@ -28,6 +30,15 @@ locals {
 			domain       = "www.aegeanrpg.com"
 			zone         = var.zone_id_aegean
 			health_check = "/api/hello"
+			exclude_dns  = false
+		},
+		{
+			name         = "weevolve"
+			port         = 3002
+			domain       = "we-evolve.co.uk"
+			zone         = var.zone_id_weevolve
+			health_check = "/api/hello"
+			exclude_dns  = true
 		}
 	]
 }
@@ -37,10 +48,13 @@ provider "aws" {
 }
 
 resource "aws_route53_record" "domains" {
-	count = length(local.domains)
+	for_each = {
+		for index, domain in local.domains : domain.domain => domain
+		if domain.exclude_dns != true
+	}
 
-	zone_id = local.domains[count.index].zone
-	name    = local.domains[count.index].domain
+	zone_id = each.value.zone
+	name    = each.value.domain
 	type    = "CNAME"
 	ttl     = 300
 	records = [aws_alb.couchdb.dns_name]

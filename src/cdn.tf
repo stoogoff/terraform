@@ -17,6 +17,12 @@ locals {
 			zone_id = var.zone_id_aegean
 			domain  = "cdn.aegeanrpg.com"
 			target_origin = "${local.environment}-cdn-aegeanrpg"
+		},
+		{
+			name    = "weevolve"
+			zone_id = var.zone_id_weevolve
+			domain  = "cdn.we-evolve.co.uk"
+			target_origin = "${local.environment}-cdn-weevolve"
 		}
 	]
 }

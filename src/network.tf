@@ -72,22 +72,13 @@ resource "aws_security_group" "container_access" {
 		protocol        = "tcp"
 		security_groups = [aws_security_group.web_access.id]
 	}
-
-	/*ingress {
-		description     = local.website.name
-		from_port       = local.website.port
-		to_port         = local.website.port
+	ingress {
+		description     = local.domains[3].name
+		from_port       = local.domains[3].port
+		to_port         = local.domains[3].port
 		protocol        = "tcp"
 		security_groups = [aws_security_group.web_access.id]
 	}
-
-	ingress {
-		description     = local.couchdb.name
-		from_port       = local.couchdb.port
-		to_port         = local.couchdb.port
-		protocol        = "tcp"
-		security_groups = [aws_security_group.web_access.id]
-	}*/
 
 	ingress {
 		description      = "SSH"
